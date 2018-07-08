@@ -1,0 +1,14 @@
+{
+  "name": "fandogh",
+  "version": "0.0.2",
+  "description": "fandogh node client",
+  "main": "fandogh.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Reza Haidari <reza.haidari.a@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.87.0"
+  }
+}
