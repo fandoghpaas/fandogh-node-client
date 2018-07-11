@@ -2,6 +2,7 @@ const Request = require('request')
 const querystring = require('querystring')
 const fs = require('fs')
 const baseUrl = 'http://fandogh.cloud:8080/api/'
+const { buildImageZip } = require('../helpers')
 
 const client =  {
   /**
@@ -109,8 +110,9 @@ const client =  {
   postVersion: async ({name, version, source, token}) => {
     try {
       let headers = client.tokenHeader(token)
+      let compressedSource = buildImageZip(source)
       let formData =  {
-        source: fs.createReadStream(source),
+        source: fs.createReadStream(compressedSource),
         name,
         version
       }
