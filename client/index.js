@@ -110,7 +110,7 @@ const client =  {
   postVersion: async ({name, version, source, token}) => {
     try {
       let headers = client.tokenHeader(token)
-      let compressedSource = buildImageZip(source)
+      let compressedSource = await buildImageZip(source)
       let formData =  {
         source: fs.createReadStream(compressedSource),
         name,

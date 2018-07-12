@@ -1,5 +1,7 @@
 const fs = require('fs');
 const archiver = require('archiver')
+const Ignore = require('@zeit/dockerignore')
+
 
 const Helpers = {
   buildImageZip: (source) => {
@@ -13,9 +15,7 @@ const Helpers = {
 
         if(!dockerfile) reject({message: 'Docker file is not available in current directory', code:'dockerfile-404'})
 
-        let filterFiles = files.filter(item => item !== 'node_modules')
-
-        Helpers.compress(filterFiles, source).then(source => {
+        Helpers.compress(files, source).then(source => {
           resolve(source)
         })
       })
@@ -39,15 +39,34 @@ const Helpers = {
       });
       archive.pipe(output)
 
+      let DockerIgnore = files.find(file => file === '.dockerignore')
+      let ignores
+      if(DockerIgnore) ignores = Ignore().add(Helpers.getIgnore(directory+'/'+DockerIgnore))
+
+      let ignore = ['workspace.zip']
+
+      if(ignores) {
+        ignores.filter(files)
+        files.forEach(path => {
+          if(ignores.ignores(path+'/') || ignores.ignores(path)){
+            ignore = ignore.concat([path, path+'/**'])
+          }
+        })
+      }
+
       archive.glob('**/*', {
         cwd: directory,
-        ignore:['workspace.zip']
+        ignore,
+        dot:true
       })
 
       archive.finalize()
 
     })
-  }
+  },
+
+  getIgnore: (path) => fs.readFileSync(path).toString().trim().replace('\r', '').split("\n")
+
 }
 
 module.exports = Helpers
