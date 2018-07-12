@@ -1,6 +1,6 @@
 const fs = require('fs');
 const archiver = require('archiver')
-const Ignore = require('@zeit/dockerignore')
+const Ignore = require('node-dockerignore')
 
 
 const Helpers = {
