@@ -1,6 +1,6 @@
 const fs = require('fs');
 const archiver = require('archiver')
-const Ignore = require('@zeit/dockerignore')
+const Ignore = require('node-dockerignore')
 
 
 const Helpers = {
@@ -21,6 +21,7 @@ const Helpers = {
       })
     })
   },
+
   compress: (files, directory) => {
 
     const path = directory+'/workspace.zip'
@@ -37,23 +38,10 @@ const Helpers = {
       archive.on('error', function(err) {
         return reject(err)
       });
+
       archive.pipe(output)
-
       let DockerIgnore = files.find(file => file === '.dockerignore')
-      let ignores
-      if(DockerIgnore) ignores = Ignore().add(Helpers.getIgnore(directory+'/'+DockerIgnore))
-
-      let ignore = ['workspace.zip']
-
-      if(ignores) {
-        ignores.filter(files)
-        files.forEach(path => {
-          if(ignores.ignores(path+'/') || ignores.ignores(path)){
-            ignore = ignore.concat([path, path+'/**'])
-          }
-        })
-      }
-
+      let ignore = Helpers.getIgnore(directory+'/'+DockerIgnore, files)
       archive.glob('**/*', {
         cwd: directory,
         ignore,
@@ -65,7 +53,22 @@ const Helpers = {
     })
   },
 
-  getIgnore: (path) => fs.readFileSync(path).toString().trim().replace('\r', '').split("\n")
+  getIgnore: (dockerignore, files) => {
+    let ignore = ['workspace.zip']
+    if(dockerignore){
+      let ignores = fs.readFileSync(dockerignore).toString().trim().replace('\r', '').split("\n")
+      let ig = Ignore().add(ignores)
+      if(ignores) {
+        ig.filter(files)
+        files.forEach(path => {
+          if(ig.ignores(path+'/') || ig.ignores(path)){
+            ignore = ignore.concat([path, path+'/**'])
+          }
+        })
+      }
+    }
+    return ignore
+  }
 
 }
 

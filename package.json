@@ -9,8 +9,8 @@
   "author": "Reza Haidari <reza.haidari.a@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "@zeit/dockerignore": "0.0.1",
     "archiver": "^2.1.1",
+    "node-dockerignore": "0.0.1",
     "request": "^2.87.0"
   }
 }
