@@ -18,9 +18,7 @@ const client =  {
   request: ({api, body , query, headers, method, formData}) => {
     let options = {
       url : baseUrl+api,
-      headers: {
-        ...headers
-      },
+      headers,
       method: method || 'GET',
       qs: query,
       form: body,
@@ -145,10 +143,10 @@ const client =  {
    * @param token
    * @returns {Promise<never>}
    */
-  postService: async ({token, ...params}) => {
+  postService: async ({token, params}) => {
     try {
       let headers = client.tokenHeader(token)
-      return await client.request({api:'services', method:'POST', headers, body: {...params}})
+      return await client.request({api:'services', method:'POST', headers, body: params})
     } catch(e) {
       return Promise.reject(e)
     }

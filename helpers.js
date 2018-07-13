@@ -2,8 +2,8 @@ const fs = require('fs');
 const archiver = require('archiver')
 const Ignore = require('node-dockerignore')
 
-
 const Helpers = {
+
   buildImageZip: (source) => {
     return new Promise((resolve, reject) => {
       fs.readdir(source, (err, files) => {

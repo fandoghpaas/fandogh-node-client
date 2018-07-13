@@ -92,7 +92,7 @@ const fandogh =  {
    */
   createService: async ({image_name, image_version, service_name, environment_variables, port, service_type, token}) => {
     try {
-      return await postService({token, image_name, image_version, service_name, environment_variables, port, service_type})
+      return await postService({token, params: {image_name, image_version, service_name, environment_variables, port, service_type}})
     } catch(e) {
       return Promise.reject(e)
     }
