@@ -66,7 +66,7 @@ const client =  {
   getImages: async ({token}) => {
     try {
       let headers = client.tokenHeader(token)
-      return await client.request({api:'images', methods:'GET', headers})
+      return await client.request({api:'images', method:'GET', headers})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -80,7 +80,7 @@ const client =  {
   postImage: async ({name, token}) => {
     try {
       let headers = client.tokenHeader(token)
-      return await client.request({api:'images', methods:'POST', headers})
+      return await client.request({api:'images', method:'POST', headers, body: {name}})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -94,7 +94,7 @@ const client =  {
   getVersions: async ({name, token}) => {
     try {
       let headers = client.tokenHeader(token)
-      return await client.request({api:`images/{name}/versions`, methods:'GET', headers})
+      return await client.request({api:`images/${name}/versions`, method:'GET', headers})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -116,7 +116,7 @@ const client =  {
         name,
         version
       }
-      return await client.request({api:'images', methods:'POST', headers, formData})
+      return await client.request({api:'images', method:'POST', headers, formData})
     } catch(e) {
       return Promise.reject(e)
     }
