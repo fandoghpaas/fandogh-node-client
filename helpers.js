@@ -7,13 +7,13 @@ const Helpers = {
   buildImageZip: (source) => {
     return new Promise((resolve, reject) => {
       fs.readdir(source, (err, files) => {
-        if(err) reject(err)
+        if(err) return reject(err)
 
         let dockerfile = files.find(file => {
           return file === 'Dockerfile'
         })
 
-        if(!dockerfile) reject({message: 'Docker file is not available in current directory', code:'dockerfile-404'})
+        if(!dockerfile) return reject({message: 'Docker file is not available in current directory', code:'dockerfile-404'})
 
         Helpers.compress(files, source).then(source => {
           resolve(source)
