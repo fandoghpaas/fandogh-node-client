@@ -1,4 +1,4 @@
-const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService} = require('./client')
+const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getLogs} = require('./client')
 
 const fandogh =  {
   /**
@@ -96,7 +96,20 @@ const fandogh =  {
     } catch(e) {
       return Promise.reject(e)
     }
-  }
+  },
+  /**
+   *
+   * @param token
+   * @param service_name
+   * @returns {Promise<never>}
+   */
+  logs : async ({token, service_name}) => {
+    try {
+      return await getLogs({token, service_name})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
 }
 
 module.exports = fandogh

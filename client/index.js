@@ -153,6 +153,20 @@ const client =  {
       return Promise.reject(e)
     }
   },
+  /**
+   *
+   * @param service_name
+   * @param token
+   * @returns {Promise<*>}
+   */
+  getLogs: async ({service_name, token}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:`services/${service_name}/logs`, method:'GET', headers})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  }
 }
 
 module.exports = client
