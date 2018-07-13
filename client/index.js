@@ -113,10 +113,56 @@ const client =  {
       let compressedSource = await buildImageZip(source)
       let formData =  {
         source: fs.createReadStream(compressedSource),
-        name,
         version
       }
-      return await client.request({api:'images', method:'POST', headers, formData})
+      return await client.request({api: `images/${name}/versions`, method:'POST', headers, formData})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+  /**
+   *
+   * @param name
+   * @param token
+   * @returns {Promise<*>}
+   */
+  getServices: async ({name, token}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:`services`, method:'GET', headers})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+  /**
+   *
+   * @param image_name
+   * @param image_version
+   * @param service_name
+   * @param environment_variables
+   * @param port
+   * @param service_type
+   * @param token
+   * @returns {Promise<never>}
+   */
+  postService: async ({token, ...params}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:'services', method:'POST', headers, body: {...params}})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+  /**
+   *
+   * @param service_name
+   * @param token
+   * @returns {Promise<*>}
+   */
+  getLogs: async ({service_name, token}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:`services/${service_name}/logs`, method:'GET', headers})
     } catch(e) {
       return Promise.reject(e)
     }
