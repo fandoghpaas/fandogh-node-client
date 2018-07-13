@@ -135,6 +135,25 @@ const client =  {
       return Promise.reject(e)
     }
   },
+  /**
+   *
+   * @param image_name
+   * @param image_version
+   * @param service_name
+   * @param environment_variables
+   * @param port
+   * @param service_type
+   * @param token
+   * @returns {Promise<never>}
+   */
+  postService: async ({token, ...params}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:'images', method:'POST', headers, body: {...params}})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
 }
 
 module.exports = client
