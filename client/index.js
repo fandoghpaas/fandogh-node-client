@@ -80,7 +80,7 @@ const client =  {
   postImage: async ({name, token}) => {
     try {
       let headers = client.tokenHeader(token)
-      return await client.request({api:'images', method:'POST', headers})
+      return await client.request({api:'images', method:'POST', headers, body: {name}})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -94,7 +94,7 @@ const client =  {
   getVersions: async ({name, token}) => {
     try {
       let headers = client.tokenHeader(token)
-      return await client.request({api:`images/{name}/versions`, method:'GET', headers})
+      return await client.request({api:`images/${name}/versions`, method:'GET', headers})
     } catch(e) {
       return Promise.reject(e)
     }
