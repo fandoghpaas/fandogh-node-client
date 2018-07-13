@@ -1,6 +1,6 @@
 {
   "name": "fandogh",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "fandogh node client",
   "main": "fandogh.js",
   "scripts": {
