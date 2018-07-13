@@ -113,10 +113,9 @@ const client =  {
       let compressedSource = await buildImageZip(source)
       let formData =  {
         source: fs.createReadStream(compressedSource),
-        name,
         version
       }
-      return await client.request({api:'images', method:'POST', headers, formData})
+      return await client.request({api: `images/${name}/versions`, method:'POST', headers, formData})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -149,7 +148,7 @@ const client =  {
   postService: async ({token, ...params}) => {
     try {
       let headers = client.tokenHeader(token)
-      return await client.request({api:'images', method:'POST', headers, body: {...params}})
+      return await client.request({api:'services', method:'POST', headers, body: {...params}})
     } catch(e) {
       return Promise.reject(e)
     }
