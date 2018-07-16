@@ -2,7 +2,8 @@ const Request = require('request')
 const querystring = require('querystring')
 const fs = require('fs')
 const baseUrl = 'http://fandogh.cloud:8080/api/'
-const { buildImageZip } = require('../helpers')
+const { buildImageZip, createYamlFile, getConfigValue } = require('../helpers')
+
 
 const client =  {
   /**
@@ -75,8 +76,11 @@ const client =  {
    * @param token
    * @returns {Promise<never>}
    */
-  postImage: async ({name, token}) => {
+  postImage: async ({name, token, source}) => {
     try {
+      if(source){
+        createYamlFile({source, imageName: name})
+      }
       let headers = client.tokenHeader(token)
       return await client.request({api:'images', method:'POST', headers, body: {name}})
     } catch(e) {
@@ -91,8 +95,10 @@ const client =  {
    */
   getVersions: async ({name, token}) => {
     try {
+      let imageName = getConfigValue({source, type:'name'})
+      imageName = name || imageName
       let headers = client.tokenHeader(token)
-      return await client.request({api:`images/${name}/versions`, method:'GET', headers})
+      return await client.request({api:`images/${imageName}/versions`, method:'GET', headers})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -107,13 +113,15 @@ const client =  {
    */
   postVersion: async ({name, version, source, token}) => {
     try {
+      let imageName = getConfigValue({source, type:'name'})
+      imageName = name || imageName
       let headers = client.tokenHeader(token)
       let compressedSource = await buildImageZip(source)
       let formData =  {
         source: fs.createReadStream(compressedSource),
         version
       }
-      return await client.request({api: `images/${name}/versions`, method:'POST', headers, formData})
+      return await client.request({api: `images/${imageName}/versions`, method:'POST', headers, formData})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -145,6 +153,8 @@ const client =  {
    */
   postService: async ({token, params}) => {
     try {
+      let imageName = getConfigValue({source: params.source, type:'name'})
+      params.image_name = params.image_name || imageName
       let headers = client.tokenHeader(token)
       return await client.request({api:'services', method:'POST', headers, body: params})
     } catch(e) {

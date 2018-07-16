@@ -32,9 +32,9 @@ const fandogh =  {
    * @param token
    * @returns {Promise<never>}
    */
-  createImage : async ({name, token}) => {
+  createImage : async ({name, source, token}) => {
     try {
-      return await postImage({token, name})
+      return await postImage({token, name, source})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -88,11 +88,12 @@ const fandogh =  {
    * @param port
    * @param service_type
    * @param token
+   * @param source
    * @returns {Promise<never>}
    */
-  createService: async ({image_name, image_version, service_name, environment_variables, port, service_type, token}) => {
+  createService: async ({image_name, image_version, service_name, environment_variables, port, service_type, source, token}) => {
     try {
-      return await postService({token, params: {image_name, image_version, service_name, environment_variables, port, service_type}})
+      return await postService({token, params: {image_name, image_version, service_name, environment_variables, port, service_type, source}})
     } catch(e) {
       return Promise.reject(e)
     }

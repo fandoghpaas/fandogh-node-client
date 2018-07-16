@@ -1,6 +1,8 @@
 const fs = require('fs');
 const archiver = require('archiver')
 const Ignore = require('node-dockerignore')
+const yaml = require('js-yaml')
+const configPath = "/.fandogh/config.yml"
 
 const Helpers = {
 
@@ -55,7 +57,7 @@ const Helpers = {
 
   getIgnore: (dockerignore, files) => {
     let ignore = ['workspace.zip']
-    if(dockerignore){
+    if(dockerignore && fs.statSync(dockerignore).isFile()){
       let ignores = fs.readFileSync(dockerignore).toString().trim().replace('\r', '').split("\n")
       let ig = Ignore().add(ignores)
       if(ignores) {
@@ -68,6 +70,44 @@ const Helpers = {
       }
     }
     return ignore
+  },
+
+  readYamlFile: (source) => {
+    try {
+      let config = fs.readFileSync(source+configPath)
+      config = yaml.load(config)
+      return config
+    } catch(e){
+      console.error(e)
+      return false
+    }
+  },
+
+  createYamlFile: ({source, imageName}) => {
+    try {
+
+      if (!fs.existsSync(source+'/.fandogh')){
+        fs.mkdirSync(source+'/.fandogh');
+      } 
+
+      let data = {}
+      if(imageName){
+        data['app.nam'] = imageName
+      }
+      let yml = yaml.dump(data)
+      fs.writeFileSync(source+configPath, yml)
+      return data
+
+    } catch(e){
+      console.error(e)
+      return false
+    }
+  },
+  getConfigValue({source, type}){
+    let config = Helpers.readYamlFile(source)
+    let configValue
+    if(config) configValue = config['app.'+type]
+    return configValue
   }
 
 }
