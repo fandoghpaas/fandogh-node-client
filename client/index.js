@@ -26,11 +26,11 @@ const client =  {
     }
     return new Promise((resolve, reject) => {
       Request(options, (error, response, body) => {
-        if(error) return reject(JSON.parse(error))
+        if(error) return reject(JSON.parse({error, code: response.statusCode}))
         if (response.statusCode === 200) {
           return resolve(JSON.parse(body))
         } else {
-          return reject(JSON.parse(body))
+          return reject({error: JSON.parse(body), code: response.statusCode})
         }
       })
     })
