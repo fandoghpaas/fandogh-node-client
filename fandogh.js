@@ -1,4 +1,5 @@
 const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getLogs} = require('./client')
+const {readYamlFile} = require('./helpers')
 
 const fandogh =  {
   /**
@@ -111,6 +112,14 @@ const fandogh =  {
       return Promise.reject(e)
     }
   },
+  /**
+   *
+   * @param source
+   * @returns {Promise<void>}
+   */
+  config: async (source) => {
+    return await readYamlFile(source)
+  }
 }
 
 module.exports = fandogh
