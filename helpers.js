@@ -92,7 +92,7 @@ const Helpers = {
 
       let data = {}
       if(imageName){
-        data['app.nam'] = imageName
+        data['app.name'] = imageName
       }
       let yml = yaml.dump(data)
       fs.writeFileSync(source+configPath, yml)
