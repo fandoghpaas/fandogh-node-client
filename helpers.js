@@ -57,7 +57,7 @@ const Helpers = {
 
   getIgnore: (dockerignore, files) => {
     let ignore = ['workspace.zip']
-    if(dockerignore && fs.statSync(dockerignore).isFile()){
+    if(dockerignore && fs.existsSync(dockerignore)){
       let ignores = fs.readFileSync(dockerignore).toString().trim().replace('\r', '').split("\n")
       let ig = Ignore().add(ignores)
       if(ignores) {
@@ -74,6 +74,7 @@ const Helpers = {
 
   readYamlFile: (source) => {
     try {
+      if(!fs.existsSync(source+configPath)) return false
       let config = fs.readFileSync(source+configPath)
       config = yaml.load(config)
       return config
