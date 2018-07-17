@@ -15,7 +15,7 @@ const Helpers = {
           return file === 'Dockerfile'
         })
 
-        if(!dockerfile) return reject({message: 'Docker file is not available in current directory', code:'dockerfile-404'})
+        if(!dockerfile) return reject({error: 'Docker file is not available in current directory', code:'dockerfile-404'})
 
         Helpers.compress(files, source).then(source => {
           resolve(source)
