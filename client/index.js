@@ -1,7 +1,7 @@
-const Request = require('request')
+const got = require('got')
 const querystring = require('querystring')
 const fs = require('fs')
-const baseUrl = 'http://fandogh.cloud:8080/api/'
+const baseUrl = 'https://api.fandogh.cloud/fa/api/'
 const { buildImageZip, createYamlFile, getConfigValue } = require('../helpers')
 
 
@@ -16,25 +16,30 @@ const client =  {
    * @param formData
    * @returns {Promise<any>}
    */
-  request: ({api, body , query, headers, method, formData}) => {
-    let options = {
-      url : baseUrl+api,
+   request: async ({api, body , query, headers, method, formData}) => {
+
+    const options = {
+      baseUrl,
       headers,
       method: method || 'GET',
-      qs: query,
-      form: body,
-      formData
+      query,
+      json: true
     }
-    return new Promise((resolve, reject) => {
-      Request(options, (error, response, body) => {
-        if(error) return reject(JSON.parse({error, code: response.statusCode}))
-        if (response.statusCode === 200) {
-          return resolve(JSON.parse(body))
-        } else {
-          return reject({error: JSON.parse(body), code: response.statusCode})
-        }
-      })
-    })
+
+    if(body || formData){
+      options.body = formData || body;
+    }
+
+    console.log(options)
+
+    try {
+      const result = await got(api, options)
+      if(result.statusCode !== 200) throw {error: result.body, code: result.statusCode}
+      return result.body;
+    } catch (error) {
+      console.log(error)
+      throw {error: error, code: error.statusCode}
+    }
   },
   /**
    *

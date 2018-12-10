@@ -10,8 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "archiver": "^2.1.1",
+    "got": "^9.3.2",
     "js-yaml": "^3.12.0",
-    "node-dockerignore": "0.0.1",
-    "request": "^2.87.0"
+    "node-dockerignore": "0.0.1"
   }
 }
