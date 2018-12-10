@@ -30,8 +30,6 @@ const client =  {
       options.body = formData || body;
     }
 
-    console.log(options)
-
     try {
       const result = await got(api, options)
       if(result.statusCode !== 200) throw {error: result.body, code: result.statusCode}
@@ -166,6 +164,16 @@ const client =  {
       return Promise.reject(e)
     }
   },
+
+  postService: async ({token, manifest}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:'services/manifests', method:'POST', headers, body: manifest})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+
   /**
    *
    * @param service_name

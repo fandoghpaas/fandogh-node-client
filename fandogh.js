@@ -1,4 +1,4 @@
-const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getLogs} = require('./client')
+const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getLogs, postManifest} = require('./client')
 const {readYamlFile} = require('./helpers')
 
 const fandogh =  {
@@ -112,6 +112,20 @@ const fandogh =  {
       return Promise.reject(e)
     }
   },
+  
+   /**
+   * @param token
+   * @param manifest
+   * @returns {Promise<never>}
+   */
+  createServiceManifest : async ({manifest, token}) => {
+    try {
+      return await postManifest({token, service_name})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+
   /**
    *
    * @param source
