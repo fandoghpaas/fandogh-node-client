@@ -1,5 +1,6 @@
 const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getLogs, postManifest} = require('./client')
-const {readYamlFile} = require('./helpers')
+const helpers = require('./helpers')
+const {readYamlFile, createYamlFile}  = helpers;
 
 const fandogh =  {
   /**
@@ -133,6 +134,9 @@ const fandogh =  {
    */
   config: async (source) => {
     return await readYamlFile(source)
+  },
+  createYaml: async ({source, configs}) => {
+    return await createYamlFile({source, configs})
   }
 }
 

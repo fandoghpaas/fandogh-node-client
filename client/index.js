@@ -1,8 +1,7 @@
 const got = require('got')
-const querystring = require('querystring')
 const fs = require('fs')
 const baseUrl = 'https://api.fandogh.cloud/fa/api/'
-const { buildImageZip, createYamlFile, getConfigValue } = require('../helpers')
+const { buildImageZip, getConfigValue } = require('../helpers')
 
 
 const client =  {
@@ -81,9 +80,6 @@ const client =  {
    */
   postImage: async ({name, token, source}) => {
     try {
-      if(source){
-        createYamlFile({source, imageName: name})
-      }
       let headers = client.tokenHeader(token)
       return await client.request({api:'images', method:'POST', headers, body: {name}})
     } catch(e) {
@@ -189,5 +185,7 @@ const client =  {
     }
   }
 }
+
+
 
 module.exports = client

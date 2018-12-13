@@ -3,6 +3,7 @@ const archiver = require('archiver')
 const Ignore = require('node-dockerignore')
 const yaml = require('js-yaml')
 const configPath = "/.fandogh/config.yml"
+const fandoghConfigs = require('./fandogh.json')
 
 const Helpers = {
 
@@ -84,20 +85,33 @@ const Helpers = {
     }
   },
 
-  createYamlFile: ({source, imageName}) => {
+  createYamlConfig: (configs) => {
+
+   const yamlConfig = {};
+   const configKeys = Object.keys(fandoghConfigs);
+   let yamlComment = '';
+
+   configKeys.forEach(config => {
+     if(configs[config]){
+       yamlConfig[config] = configs[config];
+     } else {
+       yamlComment += fandoghConfigs[config] +'\n';
+     }
+   })
+
+   let yml = yaml.dump(yamlConfig);
+   return yml+yamlComment;
+
+  },
+  createYamlFile: ({source, configs}) => {
     try {
 
       if (!fs.existsSync(source+'/.fandogh')){
         fs.mkdirSync(source+'/.fandogh');
       } 
-
-      let data = {}
-      if(imageName){
-        data['app.name'] = imageName
-      }
-      let yml = yaml.dump(data)
+      let yml = Helpers.createYamlConfig(configs);
       fs.writeFileSync(source+configPath, yml)
-      return data
+      return yml
 
     } catch(e){
       console.error(e)
