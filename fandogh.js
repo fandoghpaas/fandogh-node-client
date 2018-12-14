@@ -63,11 +63,8 @@ const fandogh =  {
    * @returns {Promise<never>}
    */
   createVersion: async ({name, version, source, token}) => {
-    try {
-      return await postVersion({token,version, source, name})
-    } catch(e) {
-      return Promise.reject(e)
-    }
+    return await postVersion({token,version, source, name})
+  
   },
   /**
    *
@@ -95,7 +92,7 @@ const fandogh =  {
    */
   createService: async ({image_name, image_version, service_name, environment_variables, port, service_type, source, token}) => {
     try {
-      return await postService({token, params: {image_name, image_version, service_name, environment_variables, port, service_type, source}})
+      return  postService({token, params: {image_name, image_version, service_name, environment_variables, port, service_type, source}})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -121,7 +118,7 @@ const fandogh =  {
    */
   createServiceManifest : async ({manifest, token}) => {
     try {
-      return await postManifest({token, service_name})
+      return await postManifest({token, manifest})
     } catch(e) {
       return Promise.reject(e)
     }

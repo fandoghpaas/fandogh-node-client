@@ -1,5 +1,7 @@
 const got = require('got')
 const fs = require('fs')
+const FormData = require('form-data')
+const EventEmitter = require('events').EventEmitter
 const baseUrl = 'https://api.fandogh.cloud/fa/api/'
 const { buildImageZip, getConfigValue } = require('../helpers')
 
@@ -94,7 +96,6 @@ const client =  {
    */
   getVersions: async ({name, token}) => {
     try {
-      let imageName = getConfigValue({source, type:'name'})
       imageName = name || imageName
       let headers = client.tokenHeader(token)
       return await client.request({api:`images/${imageName}/versions`, method:'GET', headers})
@@ -110,17 +111,28 @@ const client =  {
    * @param token
    * @returns {Promise<never>}
    */
-  postVersion: async ({name, version, source, token}) => {
+  postVersion:  async ({name, version, source, token}) => {
+
+    const emitter = new EventEmitter();
+
     try {
       let imageName = getConfigValue({source, type:'name'})
       imageName = name || imageName
       let headers = client.tokenHeader(token)
       let compressedSource = await buildImageZip(source)
-      let formData =  {
-        source: fs.createReadStream(compressedSource),
-        version
-      }
-      return await client.request({api: `images/${imageName}/versions`, method:'POST', headers, formData})
+      const form = new FormData();
+      form.append('source', fs.createReadStream(compressedSource));
+      form.append('version', version)
+      got.post(`images/${imageName}/versions`, {baseUrl, headers, body: form}).on('uploadProgress', progress => {
+        emitter.emit('uploadProgress', progress)
+        if(progress.percent === 1){
+          emitter.emit('finish', progress)
+        }
+      }).catch(e => {
+        emitter.emit('error', e)
+        Promise.reject(e)
+      })
+      return emitter;
     } catch(e) {
       return Promise.reject(e)
     }
@@ -140,7 +152,7 @@ const client =  {
     }
   },
   /**
-   *
+   * depracated
    * @param image_name
    * @param image_version
    * @param service_name
@@ -161,7 +173,7 @@ const client =  {
     }
   },
 
-  postService: async ({token, manifest}) => {
+  postManifest: async ({token, manifest}) => {
     try {
       let headers = client.tokenHeader(token)
       return await client.request({api:'services/manifests', method:'POST', headers, body: manifest})
