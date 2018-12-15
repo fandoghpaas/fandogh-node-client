@@ -126,7 +126,8 @@ const client =  {
       got.post(`images/${imageName}/versions`, {baseUrl, headers, body: form}).on('uploadProgress', progress => {
         emitter.emit('uploadProgress', progress)
         if(progress.percent === 1){
-          emitter.emit('finish', progress)
+          emitter.emit('finish', progress);
+          fs.unlinkSync(compressedSource);
         }
       }).catch(e => {
         emitter.emit('error', e)
