@@ -188,10 +188,25 @@ const client =  {
    * @param token
    * @returns {Promise<*>}
    */
-  getLogs: async ({service_name, token}) => {
+  getServiceLogs: async ({service_name, token}) => {
     try {
       let headers = client.tokenHeader(token)
       return await client.request({api:`services/${service_name}/logs`, method:'GET', headers})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+
+   /**
+   *
+   * @param service_name
+   * @param token
+   * @returns {Promise<*>}
+   */
+  getVersionLogs: async ({image, version, token}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:`images/${image}/versions/${version}/builds`, method:'GET', headers})
     } catch(e) {
       return Promise.reject(e)
     }

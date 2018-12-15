@@ -1,4 +1,4 @@
-const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getLogs, postManifest} = require('./client')
+const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getServiceLogs, getVersionLogs, postManifest} = require('./client')
 const helpers = require('./helpers')
 const {readYamlFile, createYamlFile}  = helpers;
 
@@ -63,8 +63,11 @@ const fandogh =  {
    * @returns {Promise<never>}
    */
   createVersion: async ({name, version, source, token}) => {
-    return await postVersion({token,version, source, name})
-  
+    try {
+      return await postVersion({token,version, source, name})
+    } catch(e) {
+      return Promise.reject(e)
+    }  
   },
   /**
    *
@@ -103,13 +106,26 @@ const fandogh =  {
    * @param service_name
    * @returns {Promise<never>}
    */
-  logs : async ({token, service_name}) => {
+  serviceLogs : async ({token, service_name}) => {
     try {
-      return await getLogs({token, service_name})
+      return await getServiceLogs({token, service_name})
     } catch(e) {
       return Promise.reject(e)
     }
   },
+  /** 
+  *
+  * @param token
+  * @param service_name
+  * @returns {Promise<never>}
+  */
+ versionLogs : async ({token, image, version}) => {
+   try {
+     return await getVersionLogs({token, image, version})
+   } catch(e) {
+     return Promise.reject(e)
+   }
+ },
   
    /**
    * @param token
