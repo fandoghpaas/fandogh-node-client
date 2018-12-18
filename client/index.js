@@ -1,8 +1,9 @@
-const Request = require('request')
-const querystring = require('querystring')
+const got = require('got')
 const fs = require('fs')
-const baseUrl = 'http://fandogh.cloud:8080/api/'
-const { buildImageZip, createYamlFile, getConfigValue } = require('../helpers')
+const FormData = require('form-data')
+const EventEmitter = require('events').EventEmitter
+const baseUrl = 'https://api.fandogh.cloud/fa/api/'
+const { buildImageZip, getConfigValue } = require('../helpers')
 
 
 const client =  {
@@ -16,25 +17,28 @@ const client =  {
    * @param formData
    * @returns {Promise<any>}
    */
-  request: ({api, body , query, headers, method, formData}) => {
-    let options = {
-      url : baseUrl+api,
+   request: async ({api, body , query, headers, method, formData}) => {
+
+    const options = {
+      baseUrl,
       headers,
       method: method || 'GET',
-      qs: query,
-      form: body,
-      formData
+      query,
+      json: true
     }
-    return new Promise((resolve, reject) => {
-      Request(options, (error, response, body) => {
-        if(error) return reject(JSON.parse({error, code: response.statusCode}))
-        if (response.statusCode === 200) {
-          return resolve(JSON.parse(body))
-        } else {
-          return reject({error: JSON.parse(body), code: response.statusCode})
-        }
-      })
-    })
+
+    if(body || formData){
+      options.body = formData || body;
+    }
+
+    try {
+      const result = await got(api, options)
+      if(result.statusCode !== 200) throw {error: result.body, code: result.statusCode}
+      return result.body;
+    } catch (error) {
+      console.log(error)
+      throw {error: error, code: error.statusCode}
+    }
   },
   /**
    *
@@ -78,9 +82,6 @@ const client =  {
    */
   postImage: async ({name, token, source}) => {
     try {
-      if(source){
-        createYamlFile({source, imageName: name})
-      }
       let headers = client.tokenHeader(token)
       return await client.request({api:'images', method:'POST', headers, body: {name}})
     } catch(e) {
@@ -95,7 +96,6 @@ const client =  {
    */
   getVersions: async ({name, token}) => {
     try {
-      let imageName = getConfigValue({source, type:'name'})
       imageName = name || imageName
       let headers = client.tokenHeader(token)
       return await client.request({api:`images/${imageName}/versions`, method:'GET', headers})
@@ -111,17 +111,29 @@ const client =  {
    * @param token
    * @returns {Promise<never>}
    */
-  postVersion: async ({name, version, source, token}) => {
+  postVersion:  async ({name, version, source, token}) => {
+
+    const emitter = new EventEmitter();
+
     try {
       let imageName = getConfigValue({source, type:'name'})
       imageName = name || imageName
       let headers = client.tokenHeader(token)
       let compressedSource = await buildImageZip(source)
-      let formData =  {
-        source: fs.createReadStream(compressedSource),
-        version
-      }
-      return await client.request({api: `images/${imageName}/versions`, method:'POST', headers, formData})
+      const form = new FormData();
+      form.append('source', fs.createReadStream(compressedSource));
+      form.append('version', version)
+      got.post(`images/${imageName}/versions`, {baseUrl, headers, body: form}).on('uploadProgress', progress => {
+        emitter.emit('uploadProgress', progress)
+        if(progress.percent === 1){
+          emitter.emit('finish', progress);
+          fs.unlinkSync(compressedSource);
+        }
+      }).catch(e => {
+        emitter.emit('error', e)
+        Promise.reject(e)
+      })
+      return emitter;
     } catch(e) {
       return Promise.reject(e)
     }
@@ -141,7 +153,7 @@ const client =  {
     }
   },
   /**
-   *
+   * depracated
    * @param image_name
    * @param image_version
    * @param service_name
@@ -161,20 +173,47 @@ const client =  {
       return Promise.reject(e)
     }
   },
+
+  postManifest: async ({token, manifest}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:'services/manifests', method:'POST', headers, body: manifest})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+
   /**
    *
    * @param service_name
    * @param token
    * @returns {Promise<*>}
    */
-  getLogs: async ({service_name, token}) => {
+  getServiceLogs: async ({service_name, token}) => {
     try {
       let headers = client.tokenHeader(token)
       return await client.request({api:`services/${service_name}/logs`, method:'GET', headers})
     } catch(e) {
       return Promise.reject(e)
     }
+  },
+
+   /**
+   *
+   * @param service_name
+   * @param token
+   * @returns {Promise<*>}
+   */
+  getVersionLogs: async ({image, version, token}) => {
+    try {
+      let headers = client.tokenHeader(token)
+      return await client.request({api:`images/${image}/versions/${version}/builds`, method:'GET', headers})
+    } catch(e) {
+      return Promise.reject(e)
+    }
   }
 }
+
+
 
 module.exports = client

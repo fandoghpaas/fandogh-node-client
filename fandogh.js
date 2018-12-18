@@ -1,5 +1,6 @@
-const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getLogs} = require('./client')
-const {readYamlFile} = require('./helpers')
+const {getToken, getImages, postImage, getVersions, postVersion, getServices, postService, getServiceLogs, getVersionLogs, postManifest} = require('./client')
+const helpers = require('./helpers')
+const {readYamlFile, createYamlFile}  = helpers;
 
 const fandogh =  {
   /**
@@ -66,7 +67,7 @@ const fandogh =  {
       return await postVersion({token,version, source, name})
     } catch(e) {
       return Promise.reject(e)
-    }
+    }  
   },
   /**
    *
@@ -94,7 +95,7 @@ const fandogh =  {
    */
   createService: async ({image_name, image_version, service_name, environment_variables, port, service_type, source, token}) => {
     try {
-      return await postService({token, params: {image_name, image_version, service_name, environment_variables, port, service_type, source}})
+      return  postService({token, params: {image_name, image_version, service_name, environment_variables, port, service_type, source}})
     } catch(e) {
       return Promise.reject(e)
     }
@@ -105,13 +106,40 @@ const fandogh =  {
    * @param service_name
    * @returns {Promise<never>}
    */
-  logs : async ({token, service_name}) => {
+  serviceLogs : async ({token, service_name}) => {
     try {
-      return await getLogs({token, service_name})
+      return await getServiceLogs({token, service_name})
     } catch(e) {
       return Promise.reject(e)
     }
   },
+  /** 
+  *
+  * @param token
+  * @param service_name
+  * @returns {Promise<never>}
+  */
+ versionLogs : async ({token, image, version}) => {
+   try {
+     return await getVersionLogs({token, image, version})
+   } catch(e) {
+     return Promise.reject(e)
+   }
+ },
+  
+   /**
+   * @param token
+   * @param manifest
+   * @returns {Promise<never>}
+   */
+  createServiceManifest : async ({manifest, token}) => {
+    try {
+      return await postManifest({token, manifest})
+    } catch(e) {
+      return Promise.reject(e)
+    }
+  },
+
   /**
    *
    * @param source
@@ -119,6 +147,9 @@ const fandogh =  {
    */
   config: async (source) => {
     return await readYamlFile(source)
+  },
+  createYaml: async ({source, configs}) => {
+    return await createYamlFile({source, configs})
   }
 }
 

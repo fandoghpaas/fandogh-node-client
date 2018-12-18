@@ -1,0 +1,11 @@
+{
+    "kind": "#kind: ExternalService # More info:  https://bit.ly/2Bc3Sqb",
+    "name": "#name: my-api # More info:  https://bit.ly/2Bc3Sqb",
+    "spec.image": "#spec.image: image-name:version # More info:  https://bit.ly/2QqhUyU",
+    "spec.image_pull_policy": "#spec.image_pull_policy: Always‍ # More info: https://bit.ly/2QqhUyU",
+    "spec.image_pull_secret": "#spec.image_pull_secret: secret # More info:  https://bit.ly/2QqhUyU",
+    "spec.path": "#spec.path: /blog/ # More info:  https://bit.ly/2QqhUyU",
+    "spec.allow_http": "#spec.allow_http: true # More info:  https://bit.ly/2QqhUyU",
+    "spec.env": "#spec.env: \n # - name: some_variable # More info:  https://bit.ly/2QqhUyU",
+    "spec.domains": "#spec.domains: \n # - name: domain.com # More info:  https://bit.ly/2QqhUyU"
+}
